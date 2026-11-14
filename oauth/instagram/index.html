@@ -23,6 +23,7 @@
   // El puerto viaja dentro de «state» (formato <puerto>.<aleatorio>); JEA Studio comprueba el state completo.
   (function () {
     var q = new URLSearchParams(location.search);
+    history.replaceState(null, '', location.pathname); // el código nunca se queda en la barra ni en el historial
     var state = q.get('state') || '';
     var m = /^(\d{4,5})\.[A-Za-z0-9._~-]{16,}$/.exec(state);
     var port = m ? Number(m[1]) : 0;
@@ -40,7 +41,6 @@
     var target = 'http://127.0.0.1:' + port + '/callback/?' + out.toString();
     go.href = target;
     go.hidden = false;
-    history.replaceState(null, '', location.pathname); // el código no se queda en el historial
     location.replace(target);
   })();
   </script>
