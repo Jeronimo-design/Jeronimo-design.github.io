@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Volviendo a JEA Studio…</title>
+  <link rel="icon" href="../../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+  <main class="wrap" style="min-height:70vh;display:grid;place-items:center;text-align:center">
+    <div>
+      <h1 id="t">Volviendo a JEA Studio…</h1>
+      <p class="sub" id="m">Esta página solo devuelve la autorización de Instagram a la aplicación JEA Studio de este Mac. No guarda ni envía ningún dato a otro sitio.</p>
+      <p><a class="cta" id="go" href="#" hidden>Volver a JEA Studio</a></p>
+    </div>
+  </main>
+  <script>
+  // Retorno de la autorización de Instagram (Meta exige una dirección HTTPS fija).
+  // Solo reenvía los parámetros recibidos a la escucha local de JEA Studio en 127.0.0.1:<puerto>.
+  // El puerto viaja dentro de «state» (formato <puerto>.<aleatorio>); JEA Studio comprueba el state completo.
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var state = q.get('state') || '';
+    var m = /^(\d{4,5})\.[A-Za-z0-9._~-]{16,}$/.exec(state);
+    var port = m ? Number(m[1]) : 0;
+    var t = document.getElementById('t'), msg = document.getElementById('m'), go = document.getElementById('go');
+    if (!port || port < 1024 || port > 65535) {
+      t.textContent = 'Enlace no válido';
+      msg.textContent = 'Esta dirección solo se usa al vincular una cuenta de Instagram desde JEA Studio. Vuelve a la aplicación e inténtalo de nuevo.';
+      return;
+    }
+    var out = new URLSearchParams();
+    ['code', 'state', 'error', 'error_reason', 'error_description'].forEach(function (k) {
+      var v = q.get(k);
+      if (v !== null) out.set(k, k === 'code' ? v.replace(/#_$/, '') : v);
+    });
+    var target = 'http://127.0.0.1:' + port + '/callback/?' + out.toString();
+    go.href = target;
+    go.hidden = false;
+    history.replaceState(null, '', location.pathname); // el código no se queda en el historial
+    location.replace(target);
+  })();
+  </script>
+</body>
+</html>
